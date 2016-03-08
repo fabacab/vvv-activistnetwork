@@ -56,3 +56,6 @@ git clone https://github.com/glocalcoop/activist-network-composer.git anp-compos
 mv anp-composer/composer.{json,lock} ./
 rm -rf anp-composer
 composer install
+
+wp plugin update --all
+wp theme update --all
