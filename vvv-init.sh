@@ -59,3 +59,12 @@ composer install
 
 wp plugin update --all
 wp theme update --all
+
+# Configure ANP's default multisite settings
+wp theme activate anp-network-main --url=wordpress-anp.dev
+wp theme enable anp-network-partner --network
+wp theme enable anp-network-subsite --network
+for url in `wp site list --field=url | grep "http://site[0-9]*"`
+do
+    wp theme activate anp-network-subsite --url="$url" --quiet
+done
