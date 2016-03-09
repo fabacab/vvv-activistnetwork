@@ -1,4 +1,109 @@
+#
+# @file vvv-init.sh
+#
 # Provision WordPress Multisite stable as a base for the Activist Network Platform
+# and automatically pre-configure the ANP-specific packages across the network.
+#
+
+# Globals.
+VVV_ANP_CONFIG_DIR=`pwd`
+VVV_ANP_MAINSITE_URL=`grep -v '#' "$VVV_ANP_CONFIG_DIR/vvv-hosts" | head -n 1`
+
+# Function: anpGetArgsInFile
+#
+# Gets a single list of arguments from a file ignoring lines with `#`
+#
+# @param string $1 Path to a file containing arguments
+#
+# @return string The argument list, space separated
+#
+function anpGetArgsInFile () {
+    echo `grep -v '#' "$1" | paste -s -d ' ' -`
+}
+
+#
+# Function: anpActivatePlugins
+#
+# Reads plugin slugs from a file and activates the plugins listed there.
+# The file must be suffixed with `-plugins.txt` to be considered.
+#
+# If the file is called `network-plugins.txt`, then the plugins will be
+# network-activated. If the file is called `mainsite-plugins.txt`, then
+# the plugins will be activated only for main network site. If the file
+# is named anything else then the name (excluding the `-plugins.txt part)
+# will be treated as the WP site URL for which to activate the plugins.
+#
+# @param string $1 Path to a file containing plugin slugs to activate.
+#
+function anpActivatePlugins () {
+    local file="$1"
+    local args=`anpGetWordPressContext "$file"`
+    wp plugin activate `anpGetArgsInFile "$file"` "$args"
+}
+
+#
+# Function: anpActivateThemes
+#
+# @see anpActivatePlugins
+#
+function anpActivateThemes () {
+    local file="$1"
+    local args=`anpGetWordPressContext "$file"`
+    for theme in `anpGetArgsInFile "$file"`; do
+        wp theme activate "$theme" "$args"
+    done
+}
+
+#
+# Function: anpEnableThemes
+#
+# @see anpActivatePlugins
+#
+function anpEnableThemes () {
+    local file="$1"
+    local args=`anpGetWordPressContext "$file"`
+    for theme in `anpGetArgsInFile "$file"`; do
+        wp theme enable "$theme" "$args"
+    done
+}
+
+#
+# Function: anpGetWordPressContext
+#
+# Parses a filename for the appropriate WordPress context in which to
+# apply it and returns the correct argument for a WP-CLI command.
+#
+# Filenames are expected to end in `-plugins.txt` or `-themes.txt`.
+# These suffixes are stripped and the remainder is inspected to find
+# an appropriate context, which can be one of `network`, `mainsite`,
+# or a literal Fully-Qualified Domain Name like `site2.example.dev`.
+#
+# @global $VVV_ANP_MAINSITE_URL
+#
+# @param string $1 Path to a file.
+#
+# @return string Command-line argument(s) ready to pass to a `wp` command.
+#
+function anpGetWordPressContext () {
+    local file=`basename "$1"`
+    local site
+    site="${file%-plugins.txt}" # strip -plugins.txt
+    site="${site%-themes.txt}"  # strip -themes.txt
+
+    if [ "$site" == "network" ]; then
+        site="--network"
+    elif [ "$site" == "mainsite" ]; then
+        site="--url=$VVV_ANP_MAINSITE_URL"
+    else
+        site="--url=$site"
+    fi
+
+    echo "$site" # "Return" the argument string.
+}
+
+#
+# MAIN
+#
 
 # Make a database, if we don't already have one
 echo -e "\nCreating database 'wordpress_anp' (if it's not already there)"
@@ -34,16 +139,15 @@ define( 'WP_DEBUG'    , true );
 define( 'WP_DEBUG_LOG', true );
 PHP
     echo "Installing WordPress Multisite (Subdomain Stable) for Activist Network Platform..."
-    wp core multisite-install --allow-root --url=wordpress-anp.dev --subdomains --title="Activist Network Platform (Subdomain) localDev" --admin_name=admin --admin_email="anp.admin@local.dev" --admin_password="password" --allow-root
+    wp core multisite-install --allow-root --url="$VVV_ANP_MAINSITE_URL" --subdomains --title="Activist Network Platform (Subdomain) localDev" --admin_name=admin --admin_email="anp.admin@local.dev" --admin_password="password" --allow-root
 
     # Create site admin
     wp user create "siteadmin" "admin@local.dev" --user_pass="password"
 
     # Create sites 2-5
-    wp site create --allow-root --slug=site2 --title="ANP Subsite (2)" --email="admin@local.dev"
-    wp site create --allow-root --slug=site3 --title="ANP Subsite (3)" --email="admin@local.dev"
-    wp site create --allow-root --slug=site4 --title="ANP Subsite (4)" --email="admin@local.dev"
-    wp site create --allow-root --slug=site5 --title="ANP Subsite (5)" --email="admin@local.dev"
+    for i in {2..5}; do
+        wp site create --allow-root --slug="site$i" --title="ANP Subsite ($i)" --email="admin@local.dev"
+    done
 
     echo "Installing Activist Network Platform pre-configuration using Composer..."
     git clone https://github.com/glocalcoop/activist-network-composer.git anp-composer
@@ -54,18 +158,21 @@ PHP
     wp plugin update --all
     wp theme update --all
 
-    # Configure ANP's default multisite settings
-    wp theme activate anp-network-main --url=wordpress-anp.dev
-    wp theme enable anp-network-partner --network
-    wp theme enable anp-network-subsite --network
-    for url in `wp site list --field=url | grep "http://site[0-9]*"`
-    do
+    # Configure ANP-specific defaults.
+    for file in `ls "$VVV_ANP_CONFIG_DIR"/*-plugins.txt`; do
+        anpActivatePlugins "$file"
+    done
+    for file in `ls "$VVV_ANP_CONFIG_DIR"/*-themes.txt`; do
+        anpEnableThemes "$file"
+    done
+    for url in `wp site list --field=url`; do
         wp theme activate anp-network-subsite --url="$url" --quiet
     done
+    wp theme activate anp-network-main --url="$VVV_ANP_MAINSITE_URL"
 
     # Create subsite users
-    wp user create subscriber1 "subscriber1@local.dev" --role=subscriber --user_pass=password --url=site2.wordpress-anp.dev
-    wp user create subscriber2 "subscriber2@local.dev" --role=subscriber --user_pass=password --url=site2.wordpress-anp.dev
+    wp user create subscriber1 "subscriber1@local.dev" --role=subscriber --user_pass=password --url=site2."$VVV_ANP_MAINSITE_URL"
+    wp user create subscriber2 "subscriber2@local.dev" --role=subscriber --user_pass=password --url=site2."$VVV_ANP_MAINSITE_URL"
 
 else
 

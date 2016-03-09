@@ -1,0 +1,16 @@
+#
+# This file contains plugin slugs to automatically activate for ANP's
+# specific subsite named in the filename ("site2").
+#
+# Place plugin slugs one per line. Lines containing an octothorpe (#)
+# are ignored.
+#
+anp-meetings
+bbpress
+custom-contact-forms
+event-organiser
+event-organiser-csv
+event-organiser-posterboard
+handbook
+polylang
+polylang-theme-strings
