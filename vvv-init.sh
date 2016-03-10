@@ -44,7 +44,7 @@ function anpGetArgsInFile () {
 function anpActivatePlugins () {
     local file="$1"
     local args=`anpGetWordPressContext "$file"`
-    wp plugin activate `anpGetArgsInFile "$file"` "$args"
+    wp plugin activate `anpGetArgsInFile "$file"` "$args" --allow-root
 }
 
 #
@@ -56,7 +56,7 @@ function anpActivateThemes () {
     local file="$1"
     local args=`anpGetWordPressContext "$file"`
     for theme in `anpGetArgsInFile "$file"`; do
-        wp theme activate "$theme" "$args"
+        wp theme activate "$theme" "$args" --allow-root
     done
 }
 
@@ -69,7 +69,7 @@ function anpEnableThemes () {
     local file="$1"
     local args=`anpGetWordPressContext "$file"`
     for theme in `anpGetArgsInFile "$file"`; do
-        wp theme enable "$theme" "$args"
+        wp theme enable "$theme" "$args" --allow-root
     done
 }
 
@@ -145,10 +145,10 @@ define( 'WP_DEBUG'    , true );
 define( 'WP_DEBUG_LOG', true );
 PHP
     echo "Installing WordPress Multisite (Subdomain Stable) for Activist Network Platform..."
-    wp core multisite-install --allow-root --url="$VVV_ANP_MAINSITE_URL" --subdomains --title="Activist Network Platform (Subdomain) localDev" --admin_name=admin --admin_email="anp.admin@local.dev" --admin_password="password" --allow-root
+    wp core multisite-install --allow-root --url="$VVV_ANP_MAINSITE_URL" --subdomains --title="Activist Network Platform (Subdomain) localDev" --admin_name=admin --admin_email="anp.admin@local.dev" --admin_password="password"
 
     # Create site admin
-    wp user create "siteadmin" "admin@local.dev" --user_pass="password"
+    wp user create --allow-root "siteadmin" "admin@local.dev" --user_pass="password"
 
     # Create sites 2-5
     for i in {2..5}; do
@@ -161,24 +161,26 @@ PHP
     rm -rf anp-composer
     composer ${VVV_ANP_COMPOSER_CMD:-install}
 
-    wp plugin update --all
-    wp theme update --all
+    wp plugin update --all --allow-root
+    wp theme update --all --allow-root
 
     # Configure ANP-specific defaults.
+    php "$VVV_ANP_CONFIG_DIR"/vvv-init.php
     for file in `ls "$VVV_ANP_CONFIG_DIR"/*-plugins.txt`; do
         anpActivatePlugins "$file"
     done
     for file in `ls "$VVV_ANP_CONFIG_DIR"/*-themes.txt`; do
         anpEnableThemes "$file"
     done
-    for url in `wp site list --field=url`; do
-        wp theme activate anp-network-main-child --url="$url" --quiet
+    rm -f "$VVV_ANP_CONFIG_DIR"/*-{plugins,themes}.txt
+    for url in `wp site list --field=url --allow-root`; do
+        wp theme activate anp-network-main-child --url="$url" --quiet --allow-root
     done
-    wp theme activate anp-network-main --url="$VVV_ANP_MAINSITE_URL"
+    wp theme activate anp-network-main --url="$VVV_ANP_MAINSITE_URL" --allow-root
 
     # Create subsite users
-    wp user create subscriber1 "subscriber1@local.dev" --role=subscriber --user_pass=password --url=site2."$VVV_ANP_MAINSITE_URL"
-    wp user create subscriber2 "subscriber2@local.dev" --role=subscriber --user_pass=password --url=site2."$VVV_ANP_MAINSITE_URL"
+    wp user create subscriber1 "subscriber1@local.dev" --role=subscriber --user_pass=password --url=site2."$VVV_ANP_MAINSITE_URL" --allow-root
+    wp user create subscriber2 "subscriber2@local.dev" --role=subscriber --user_pass=password --url=site2."$VVV_ANP_MAINSITE_URL" --allow-root
 
 else
 

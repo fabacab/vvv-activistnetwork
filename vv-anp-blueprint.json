@@ -1,0 +1,172 @@
+{
+  "vvv-activistnetwork": {
+    "themes": [
+      {
+        "location": "https://github.com/glocalcoop/anp-network-main-v2/archive/master.zip",
+        "activate": true,
+        "slug": "anp-network-main"
+      },
+      {
+        "location": "https://github.com/glocalcoop/anp-network-main-child/archive/master.zip",
+        "activate_network": true
+      }
+    ],
+    "plugins": [
+      {
+        "location": "bp-event-organiser",
+        "activate": true
+      },
+      {
+        "location": "bp-mpo-activity-filter",
+        "activate": true
+      },
+      {
+        "location": "buddypress-docs",
+        "activate": true
+      },
+      {
+        "location": "buddypress-group-email-subscription",
+        "activate": true
+      },
+      {
+        "location": "custom-profile-filters-for-buddypress",
+        "activate": true
+      },
+      {
+        "location": "invite-anyone",
+        "activate": true
+      },
+      {
+        "location": "members",
+        "activate_network": true
+      },
+      {
+        "location": "user-switching",
+        "activate_network": true
+      },
+      {
+        "location": "https://github.com/glocalcoop/anp-buddypress-customization/archive/master.zip",
+        "activate_network": true
+      },
+      {
+        "location": "https://github.com/glocalcoop/anp-global-menu/archive/master.zip",
+        "activate_network": true
+      },
+      {
+        "location": "blog-copier",
+        "activate_network": true
+      },
+      {
+        "location": "bp-groupblog",
+        "activate_network": true
+      },
+      {
+        "location": "buddypress",
+        "activate_network": true
+      },
+      {
+        "location": "jetpack",
+        "activate_network": true
+      },
+      {
+        "location": "jetpack-module-control",
+        "activate_network": true
+      },
+      {
+        "location": "more-privacy-options",
+        "activate_network": true
+      },
+      {
+        "location": "multisite-plugin-manager",
+        "activate_network": true
+      },
+      {
+        "location": "nav-menu-roles",
+        "activate_network": true
+      },
+      {
+        "location": "restricted-site-access",
+        "activate_network": true
+      },
+      {
+        "location": "rss-importer",
+        "activate_network": true
+      },
+      {
+        "location": "siteorigin-panels",
+        "activate_network": true
+      },
+      {
+        "location": "so-widgets-bundle",
+        "activate_network": true
+      },
+      {
+        "location": "unconfirmed",
+        "activate_network": true
+      },
+      {
+        "location": "wordpress-importer",
+        "activate_network": true
+      },
+      {
+        "location": "wordpress-mu-domain-mapping",
+        "activate_network": true
+      },
+      {
+        "location": "wp-email-login",
+        "activate_network": true
+      },
+      {
+        "location": "wp-mailfrom-ii",
+        "activate_network": true
+      },
+      {
+        "location": "wp-multisite-feed",
+        "activate_network": true
+      }
+    ],
+    "sites": [
+      {
+        "name": "site2",
+        "plugins": [
+          {
+            "location": "https://github.com/glocalcoop/anp-meetings/archive/master.zip",
+            "activate": true
+          },
+          {
+            "location": "bbpress",
+            "activate": true
+          },
+          {
+            "location": "custom-contact-forms",
+            "activate": true
+          },
+          {
+            "location": "event-organiser",
+            "activate": true
+          },
+          {
+            "location": "event-organiser-csv",
+            "activate": true
+          },
+          {
+            "location": "event-organiser-posterboard",
+            "activate": true
+          },
+          {
+            "location": "handbook",
+            "activate": true
+          },
+          {
+            "location": "polylang",
+            "activate": true
+          },
+          {
+            "location": "polylang-theme-strings",
+            "activate": true
+          }
+        ]
+      }
+    ]
+  }
+}
