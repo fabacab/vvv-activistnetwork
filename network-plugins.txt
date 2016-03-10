@@ -25,5 +25,5 @@ user-switching
 wordpress-importer
 wordpress-mu-domain-mapping
 wp-email-login
-wp-mail-smtp
+wp-mailfrom-ii
 wp-multisite-feed

@@ -9,6 +9,12 @@
 VVV_ANP_CONFIG_DIR=`pwd`
 VVV_ANP_MAINSITE_URL=`grep -v '#' "$VVV_ANP_CONFIG_DIR/vvv-hosts" | head -n 1`
 
+# Custom globals.
+# These customize the behavior of the provisioner.
+if [ -f "$VVV_ANP_CONFIG_DIR"/anp-config.sh ] && [ -r "$VVV_ANP_CONFIG_DIR"/anp-config.sh ]; then
+    source "$VVV_ANP_CONFIG_DIR"/anp-config.sh
+fi
+
 # Function: anpGetArgsInFile
 #
 # Gets a single list of arguments from a file ignoring lines with `#`
@@ -150,10 +156,10 @@ PHP
     done
 
     echo "Installing Activist Network Platform pre-configuration using Composer..."
-    git clone https://github.com/glocalcoop/activist-network-composer.git anp-composer
+    git clone ${VVV_ANP_COMPOSER_GIT:-https://github.com/glocalcoop/activist-network-composer.git} anp-composer
     mv anp-composer/composer.{json,lock} ./
     rm -rf anp-composer
-    composer install
+    composer ${VVV_ANP_COMPOSER_CMD:-install}
 
     wp plugin update --all
     wp theme update --all
@@ -166,7 +172,7 @@ PHP
         anpEnableThemes "$file"
     done
     for url in `wp site list --field=url`; do
-        wp theme activate anp-network-subsite --url="$url" --quiet
+        wp theme activate anp-network-main-child --url="$url" --quiet
     done
     wp theme activate anp-network-main --url="$VVV_ANP_MAINSITE_URL"
 

@@ -1,0 +1,12 @@
+#
+# VVV provisioner for ANP sample configuration.
+#
+# This is a sample configuration file for the VVV Multisite provision
+# script provided with Activist Network Platform. Use it to customize
+# the behavior of your vvv-activistnetwork provisioning script.
+#
+
+# Alternate vvv-activistnetwork clone URL
+VVV_ANP_COMPOSER_GIT=https://github.com/meitar/activist-network-composer.git
+# Run `composer update` instead of `composer install`
+VVV_ANP_COMPOSER_CMD=update

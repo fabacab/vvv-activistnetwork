@@ -1,2 +1,8 @@
-anp-network-partner
-anp-network-subsite
+#
+# This file contains theme slugs to automatically activate for ANP's
+# sites across the whole network (i.e., they are network-activated).
+#
+# Place theme slugs one per line. Lines containing an octothorpe (#)
+# are ignored.
+#
+anp-network-main-child
