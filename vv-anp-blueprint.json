@@ -125,9 +125,8 @@
         "activate_network": true
       }
     ],
-    "sites": [
-      {
-        "name": "site2",
+    "sites": {
+      "site2": {
         "plugins": [
           {
             "location": "https://github.com/glocalcoop/anp-meetings/archive/master.zip",
@@ -167,6 +166,6 @@
           }
         ]
       }
-    ]
+    }
   }
 }

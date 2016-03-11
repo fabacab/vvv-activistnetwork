@@ -50,8 +50,8 @@ function printSlugs ($site, $type) {
     $prop = 'activate';
     if (in_array($site, $sites)) {
         if (!empty($blueprints->$blueprint->sites)) {
-            foreach ($blueprints->$blueprint->sites as $the_site) {
-                if (false !== stripos($site, $the_site->name)) {
+            foreach ($blueprints->$blueprint->sites as $site_name => $the_site) {
+                if (false !== stripos($site, $site_name)) {
                     foreach ($the_site->plugins as $obj) {
                         if (!empty($obj->$prop)) {
                             fputs($fh, getSlug($obj->location).PHP_EOL);
