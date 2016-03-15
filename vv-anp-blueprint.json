@@ -7,8 +7,9 @@
         "slug": "anp-network-main"
       },
       {
-        "location": "https://github.com/glocalcoop/anp-network-main-child/archive/master.zip",
-        "activate_network": true
+        "location": "https://github.com/glocalcoop/anp-network-main-v2-child/archive/master.zip",
+        "activate_network": true,
+        "slug": "anp-network-main-child"
       }
     ],
     "plugins": [
