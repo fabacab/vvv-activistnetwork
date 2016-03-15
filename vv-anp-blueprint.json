@@ -117,7 +117,7 @@
         "activate_network": true
       },
       {
-        "location": "wp-mailfrom-ii",
+        "location": "email-templates",
         "activate_network": true
       },
       {
