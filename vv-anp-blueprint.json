@@ -42,6 +42,10 @@
         "activate_network": true
       },
       {
+        "location": "multisite-directory",
+        "activate_network": true
+      },
+      {
         "location": "user-switching",
         "activate_network": true
       },
