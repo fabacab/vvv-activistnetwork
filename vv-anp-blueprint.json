@@ -122,6 +122,10 @@
         "activate_network": true
       },
       {
+        "location": "wp-pgp-encryptedemails",
+        "activate_network": true
+      },
+      {
         "location": "email-templates",
         "activate_network": true
       },
