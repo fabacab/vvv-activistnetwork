@@ -70,6 +70,10 @@
         "activate_network": true
       },
       {
+        "location": "email-templates",
+        "activate_network": true
+      },
+      {
         "location": "jetpack",
         "activate_network": true
       },
@@ -130,11 +134,11 @@
         "activate_network": true
       },
       {
-        "location": "email-templates",
+        "location": "wp-multisite-feed",
         "activate_network": true
       },
       {
-        "location": "wp-multisite-feed",
+        "location": "wp-pgp-encrypted-emails",
         "activate_network": true
       }
     ],
