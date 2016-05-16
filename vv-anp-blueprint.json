@@ -15,7 +15,7 @@
     "plugins": [
       {
         "location": "bp-event-organiser",
-        "activate": true
+        "activate_network": true
       },
       {
         "location": "bp-mpo-activity-filter",
@@ -70,11 +70,19 @@
         "activate_network": true
       },
       {
+        "location": "email-templates",
+        "activate_network": true
+      },
+      {
         "location": "jetpack",
         "activate_network": true
       },
       {
         "location": "jetpack-module-control",
+        "activate_network": true
+      },
+      {
+        "location": "kirki",
         "activate_network": true
       },
       {
@@ -95,6 +103,10 @@
       },
       {
         "location": "rss-importer",
+        "activate_network": true
+      },
+      {
+        "location": "shortcake",
         "activate_network": true
       },
       {
@@ -122,15 +134,11 @@
         "activate_network": true
       },
       {
-        "location": "wp-pgp-encrypted-emails",
-        "activate_network": true
-      },
-      {
-        "location": "email-templates",
-        "activate_network": true
-      },
-      {
         "location": "wp-multisite-feed",
+        "activate_network": true
+      },
+      {
+        "location": "wp-pgp-encrypted-emails",
         "activate_network": true
       }
     ],
@@ -147,18 +155,6 @@
           },
           {
             "location": "custom-contact-forms",
-            "activate": true
-          },
-          {
-            "location": "event-organiser",
-            "activate": true
-          },
-          {
-            "location": "event-organiser-csv",
-            "activate": true
-          },
-          {
-            "location": "event-organiser-posterboard",
             "activate": true
           },
           {
