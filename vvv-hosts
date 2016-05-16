@@ -1,6 +1,13 @@
-# ANP WP Multisite subdomain stable
+# ANP main WP Multisite subdomain
 wordpress-anp.dev
 site2.wordpress-anp.dev
 site3.wordpress-anp.dev
 site4.wordpress-anp.dev
 site5.wordpress-anp.dev
+
+# ANP subnetwork subdomains
+wpmn-anp.dev
+site2.wpmn-anp.dev
+site3.wpmn-anp.dev
+site4.wpmn-anp.dev
+site5.wpmn-anp.dev

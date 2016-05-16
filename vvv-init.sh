@@ -7,13 +7,27 @@
 
 # Globals.
 VVV_ANP_CONFIG_DIR=`pwd`
-VVV_ANP_MAINSITE_URL=`grep -v '#' "$VVV_ANP_CONFIG_DIR/vvv-hosts" | head -n 1`
+VVV_ANP_NETWORK_DOMAINS=(
+    `grep -E '^[^\.]*+\.[^\.]*+$' "$VVV_ANP_CONFIG_DIR/vvv-hosts"`
+) # Array of network domain root URLs.
 
 # Custom globals.
 # These customize the behavior of the provisioner.
 if [ -f "$VVV_ANP_CONFIG_DIR"/anp-config.sh ] && [ -r "$VVV_ANP_CONFIG_DIR"/anp-config.sh ]; then
     source "$VVV_ANP_CONFIG_DIR"/anp-config.sh
 fi
+
+# Function: anpGetNetworkRootDomain
+#
+# Gets the root domain for a given WP Multi-Network network.
+#
+# @param string $1 The network number, starting at 1 (for main network root)
+#
+# @return string The domain name of the network.
+#
+function anpGetNetworkRootDomain () {
+    echo "${VVV_ANP_NETWORK_DOMAINS[$1]}"
+}
 
 # Function: anpGetArgsInFile
 #
@@ -35,7 +49,7 @@ function anpGetArgsInFile () {
 #
 # If the file is called `network-plugins.txt`, then the plugins will be
 # network-activated. If the file is called `mainsite-plugins.txt`, then
-# the plugins will be activated only for main network site. If the file
+# the plugins will be activated only for network's mainsite. If the file
 # is named anything else then the name (excluding the `-plugins.txt part)
 # will be treated as the WP site URL for which to activate the plugins.
 #
@@ -84,9 +98,10 @@ function anpEnableThemes () {
 # an appropriate context, which can be one of `network`, `mainsite`,
 # or a literal Fully-Qualified Domain Name like `site2.example.dev`.
 #
-# @global $VVV_ANP_MAINSITE_URL
+# @global $VVV_ANP_NETWORK_DOMAINS
 #
 # @param string $1 Path to a file.
+# @param string $2 Numeric network ID. Defaults to `1`.
 #
 # @return string Command-line argument(s) ready to pass to a `wp` command.
 #
@@ -99,7 +114,7 @@ function anpGetWordPressContext () {
     if [ "$site" == "network" ]; then
         site="--network"
     elif [ "$site" == "mainsite" ]; then
-        site="--url=$VVV_ANP_MAINSITE_URL"
+        site="--url=${VVV_ANP_NETWORK_DOMAINS[${2:-1}]}" # default to network number 1
     else
         site="--url=$site"
     fi
@@ -109,6 +124,8 @@ function anpGetWordPressContext () {
 
 #
 # MAIN
+#
+# TODO: Make this an actual function, eh?
 #
 
 # Make a database, if we don't already have one
@@ -130,22 +147,35 @@ if [[ ! -d /srv/www/wordpress-anp ]]; then
     mkdir /srv/www/wordpress-anp
     cd /srv/www/wordpress-anp
 
-    echo "Downloading WordPress Multisite (Subdomain Stable) for Activist Network Platform, see http://glocal.coop/activist-network-platform/"
+    echo "Downloading WordPress Multisite (Subdomain Stable) for Activist Network Platform, see https://glocal.coop/activist-network-platform/"
     wp core download --allow-root
 
     echo "Configuring WordPress Multisite Subdomain Stable..."
     wp core config --dbname=wordpress_anp --dbuser=wp --dbpass=wp --extra-php --allow-root <<PHP
-// Match any requests made via xip.io.
-if ( isset( \$_SERVER['HTTP_HOST'] ) && preg_match('/^(wordpress-anp.)\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(.xip.io)\z/', \$_SERVER['HTTP_HOST'] ) ) {
+// Match any requests made via xip.io or for WP Multi-Network.
+if ( isset( \$_SERVER['HTTP_HOST'] ) ) {
     define( 'WP_HOME', 'http://' . \$_SERVER['HTTP_HOST'] );
     define( 'WP_SITEURL', 'http://' . \$_SERVER['HTTP_HOST'] );
 }
+
+// Shared cookies across multi-domain WP multi-Network setup
+define( 'COOKIEHASH',        md5( '${VVV_ANP_NETWORK_DOMAINS[0]}' ) );
+define( 'COOKIE_DOMAIN',     '${VVV_ANP_NETWORK_DOMAINS[0]}'        );
+define( 'ADMIN_COOKIE_PATH', '/' );
+define( 'COOKIEPATH',        '/' );
+define( 'SITECOOKIEPATH',    '/' );
+define( 'TEST_COOKIE',        'wpmn_test_cookie' );
+define( 'AUTH_COOKIE',        'wpmn_'          . COOKIEHASH );
+define( 'USER_COOKIE',        'wpmn_user_'     . COOKIEHASH );
+define( 'PASS_COOKIE',        'wpmn_pass_'     . COOKIEHASH );
+define( 'SECURE_AUTH_COOKIE', 'wpmn_sec_'      . COOKIEHASH );
+define( 'LOGGED_IN_COOKIE',   'wpmn_logged_in' . COOKIEHASH );
 
 define( 'WP_DEBUG'    , true );
 define( 'WP_DEBUG_LOG', true );
 PHP
     echo "Installing WordPress Multisite (Subdomain Stable) for Activist Network Platform..."
-    wp core multisite-install --allow-root --url="$VVV_ANP_MAINSITE_URL" --subdomains --title="Activist Network Platform (Subdomain) localDev" --admin_name=admin --admin_email="anp.admin@local.dev" --admin_password="password"
+    wp core multisite-install --allow-root --url="${VVV_ANP_NETWORK_DOMAINS[0]}" --subdomains --title="Activist Network Platform (Subdomain) localDev" --admin_name=admin --admin_email="anp.admin@local.dev" --admin_password="password"
 
     # Create site admin
     wp user create --allow-root "siteadmin" "admin@local.dev" --user_pass="password"
@@ -165,6 +195,7 @@ PHP
     wp theme update --all --allow-root
 
     # Configure ANP-specific defaults.
+    # TODO: Replace this custom PHP and shell stuff with Variable VV's PHP install helper?
     php "$VVV_ANP_CONFIG_DIR"/vvv-init.php
     for file in `ls "$VVV_ANP_CONFIG_DIR"/*-plugins.txt`; do
         anpActivatePlugins "$file"
@@ -176,11 +207,25 @@ PHP
     for url in `wp site list --field=url --allow-root`; do
         wp theme activate anp-network-main-child --url="$url" --quiet --allow-root
     done
-    wp theme activate anp-network-main --url="$VVV_ANP_MAINSITE_URL" --allow-root
+    wp theme activate anp-network-main --url="${VVV_ANP_NETWORK_DOMAINS[0]}" --allow-root
 
     # Create subsite users
-    wp user create subscriber1 "subscriber1@local.dev" --role=subscriber --user_pass=password --url=site2."$VVV_ANP_MAINSITE_URL" --allow-root
-    wp user create subscriber2 "subscriber2@local.dev" --role=subscriber --user_pass=password --url=site2."$VVV_ANP_MAINSITE_URL" --allow-root
+    wp user create subscriber1 "subscriber1@local.dev" --role=subscriber --user_pass=password --url=site2."${VVV_ANP_NETWORK_DOMAINS[0]}" --allow-root
+    wp user create subscriber2 "subscriber2@local.dev" --role=subscriber --user_pass=password --url=site2."${VVV_ANP_NETWORK_DOMAINS[0]}" --allow-root
+
+    # Replace static configuration with WP Multi-Network constant.
+    # From here on out, most `wp` commands require the `--url` argument.
+    sed "s/DOMAIN_CURRENT_SITE\(.*\)'${VVV_ANP_NETWORK_DOMAINS[0]}'/DOMAIN_CURRENT_SITE\1\$_SERVER['HTTP_HOST']/" wp-config.php > tmpconfig.php
+    mv tmpconfig.php wp-config.php
+
+    # Create sub-network domain(s).
+    for domain in "${VVV_ANP_NETWORK_DOMAINS[@]}"; do
+        wp wp-multi-network create "$domain" "/" --user=admin --allow-root --url="${VVV_ANP_NETWORK_DOMAINS[0]}"
+        # Create sites 2-5
+        for i in {2..5}; do
+            wp site create --allow-root --slug="site$i" --title="ANP $domain Subsite ($i)" --email="admin@local.dev" --url="$domain"
+        done
+    done
 
 else
 

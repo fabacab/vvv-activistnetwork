@@ -134,6 +134,10 @@
         "activate_network": true
       },
       {
+        "location": "wp-multi-network",
+        "activate_network": true
+      },
+      {
         "location": "wp-multisite-feed",
         "activate_network": true
       },
