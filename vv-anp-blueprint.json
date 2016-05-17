@@ -1,5 +1,13 @@
 {
   "vvv-activistnetwork": {
+    "vvv-activistnetwork::subdomains": "site2 site3 site4 site5 site7 site8 site9 site10",
+    "vvv-activistnetwork::subnetwork_domains": "wpmn-anp.dev",
+    "networks": {
+      "wpmn-anp.dev": {
+        "path": "/",
+        "site_name": "ANP Subnetwork Example"
+      }
+    },
     "themes": [
       {
         "location": "https://github.com/glocalcoop/anp-network-main-v2/archive/master.zip",
@@ -174,6 +182,10 @@
             "activate": true
           }
         ]
+      },
+      "site7": {
+        "network_domain": "wpmn-anp.dev",
+        "title": "Subnetwork Subsite Example"
       }
     }
   }

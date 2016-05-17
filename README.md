@@ -10,17 +10,18 @@ Provision [Activist Network Platform](https://glocal.coop/activist-network-platf
 
 ## Provided Sites
 
-1. `wordpress-anp.dev` (Main Network Site)
-1. `site{2..5}.wordpress-anp.dev` (Main network's subsites 2 through 5)
-1. `wpmn-anp.dev` (Sub-network root site)
-1. `site{2..5}.wpmn-anp.dev` (Sub-network's subsites 2 through 5)
+1. `wordpress-anp.dev` (Main Network Site, aka "Site 1")
+1. `site{2..5}.wordpress-anp.dev` (Main network's subsites, aka "Sites 2 through 5")
+1. `wpmn-anp.dev` (Sub-network root site, aka "Site 6")
+1. `site{7..10}.wpmn-anp.dev` (Sub-network's subsites, aka "Sites 7 through 10")
 
 ## Using [Variable VV](https://github.com/bradp/vv)
 
-This alternate procedure makes use of the `vv` wizard, and assumes you already have VVV installed. Its results are almost the same as a vanilla VVV `--provision`, but without the multi-network configuration. That is, this method only results in a single WP Multisite.
+This alternate procedure makes use of the `vv` wizard, and assumes you already have VVV installed.
 
 1. Copy the `vv-anp-blueprint.json` file to `vv-blueprints.json` in your VVV directory.
-1. Create the main site with `vv create --blueprint vvv-activistnetwork --multisite subdomain`
+1. Create the main site with `vv create --blueprint vvv-activistnetwork --multisite subdomain`.
+    * Answer `y` when prompted whether to install as a Multisite.
 
 ## Copyright / License
 

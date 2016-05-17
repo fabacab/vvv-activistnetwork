@@ -222,7 +222,7 @@ PHP
     for domain in "${VVV_ANP_NETWORK_DOMAINS[@]}"; do
         wp wp-multi-network create "$domain" "/" --user=admin --allow-root --url="${VVV_ANP_NETWORK_DOMAINS[0]}"
         # Create sites 2-5
-        for i in {2..5}; do
+        for i in {7..10}; do
             wp site create --allow-root --slug="site$i" --title="ANP $domain Subsite ($i)" --email="admin@local.dev" --url="$domain"
         done
     done
